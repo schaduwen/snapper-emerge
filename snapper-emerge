@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+from sys import exit, argv
+from os import system
+
+RESPONSES = ["Yes", "No"]
+
+
+def bold(s):
+    return f"\033[1m{s}\033[0m"
+
+
+def colour(s):
+    if s == RESPONSES[0]:
+        return f"\033[92m{s}\033[00m"
+    if s == RESPONSES[1]:
+        return f"\033[91m{s}\033[00m"
+    return s
+
+
+print(bold("Would you like to create snapper snapshot?"), end=" ")
+try:
+    while True:
+        response = input(
+            f"[{'/'.join(bold(colour(RESPONSES[i])) for i in range(len(RESPONSES)))}] "
+        )
+        for key in RESPONSES:
+            if response.upper() == key[: len(response)].upper():
+                cmd = "emerge " + ' '.join(argv[1:])
+                if key == "No":
+                    system(cmd)
+                else:
+                    system(f"snapper create --command \"{cmd}\" --description \"{cmd}\"")
+                exit()
+        print(f"Sorry, response '{response}' not understood.", end=" ")
+except (EOFError, KeyboardInterrupt):
+    print("Interrupted.")
+    exit()
